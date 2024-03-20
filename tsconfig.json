@@ -17,7 +17,7 @@
     "jsx": "preserve"
 
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", ".next/types/**/*.ts"],
   "exclude": [
     "node_modules", "dist"
   ]
