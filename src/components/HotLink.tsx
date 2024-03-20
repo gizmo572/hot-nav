@@ -12,6 +12,8 @@ interface HotLinkProps {
 
 const HotLink: React.FC<HotLinkProps> = ({ href, children }): ReactElement => {
   const { testVar } = useHotNavigation();
+
+
   console.log('testVar', testVar)
 
   return (
