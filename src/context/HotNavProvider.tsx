@@ -7,10 +7,19 @@ interface _Link {
   href: string;
 };
 
+interface HotNavContextType {
+  registerLink: (href: string, id: string) => void;
+  unregisterLink: (id: string) => void;
+  hotkeysActivated: boolean;
+  links: _Link[];
+}
 
-const HotNavigationContext = createContext({
-  registerLink: (id: string, href: string) => {},
-  unregisterLink: (id: string) => {},
+
+const HotNavigationContext = createContext<HotNavContextType>({
+  registerLink: () => {},
+  unregisterLink: () => {},
+  hotkeysActivated: false,
+  links: [],
 });
 
 export const useHotNavigation = () => useContext(HotNavigationContext);
@@ -61,7 +70,7 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
   }, [hotkeysActivated]);
 
   return (
-    <HotNavigationContext.Provider value={{ registerLink, unregisterLink }} >
+    <HotNavigationContext.Provider value={{ registerLink, unregisterLink, hotkeysActivated, links }} >
       {children}
     </HotNavigationContext.Provider>
   );

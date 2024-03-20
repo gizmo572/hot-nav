@@ -11,7 +11,7 @@ interface HotLinkProps {
 
 
 const HotLink: React.FC<HotLinkProps> = ({ href, children }): ReactElement => {
-  const { registerLink, unregisterLink } = useHotNavigation();
+  const { registerLink, unregisterLink, hotkeysActivated, links } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children }): ReactElement => {
   }, [registerLink, unregisterLink])
 
 
-  console.log('registerLink', registerLink)
+  console.log('hotkeysActivated', hotkeysActivated, 'links',links)
 
   return (
     <Link href={href}>
