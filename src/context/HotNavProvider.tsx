@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactElement, createContext, useContext, useEffect } from 'react';
+import React, { ReactElement, createContext, useContext, useEffect, useState } from 'react';
 
 
 const HotNavigationContext = createContext({
@@ -14,9 +14,15 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
   console.log('HELLO WORLD FROM HOT-NAV!!!');
   const testVar = 'GREETINGS FROM HOT-NAV!!!!';
 
+  const [hotkeysActivated, setHotKeysActivated] = useState(false);
+
   useEffect(() => {
+    console.log('hotkeysActivated', hotkeysActivated)
     const handleKeyDown = (e: KeyboardEvent) => {
       console.log(`${e.key} PRESSED!!!`);
+      if (e.key == 'Control') {
+        setHotKeysActivated((prev) => !prev);
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -31,7 +37,7 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
       document.removeEventListener('keyup', handleKeyUp);
     }
 
-  }, []);
+  }, [hotkeysActivated]);
 
   return (
     <HotNavigationContext.Provider value={{ testVar }} >
