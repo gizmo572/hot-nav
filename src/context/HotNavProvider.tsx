@@ -10,6 +10,7 @@ interface _Link {
 
 const HotNavigationContext = createContext({
   registerLink: (id: string, href: string) => {},
+  unregisterLink: (id: string) => {},
 });
 
 export const useHotNavigation = () => useContext(HotNavigationContext);
@@ -24,7 +25,11 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
 
   const registerLink = useCallback((id: string, href: string) => {
     setLinks((prev) => [...prev, { id, href }]);
-  }, [])
+  }, []);
+
+  const unregisterLink = useCallback((id: string) => {
+    setLinks((prev) => prev.filter((link) => link.id !== id));
+  }, []);
 
   useEffect(() => {
     console.log('hotkeysActivated', hotkeysActivated)
@@ -56,7 +61,7 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
   }, [hotkeysActivated]);
 
   return (
-    <HotNavigationContext.Provider value={{ registerLink }} >
+    <HotNavigationContext.Provider value={{ registerLink, unregisterLink }} >
       {children}
     </HotNavigationContext.Provider>
   );

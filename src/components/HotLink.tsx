@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactElement, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useHotNavigation } from '../context/HotNavProvider';
 
@@ -11,8 +11,19 @@ interface HotLinkProps {
 
 
 const HotLink: React.FC<HotLinkProps> = ({ href, children }): ReactElement => {
-  const { registerLink } = useHotNavigation();
+  const { registerLink, unregisterLink } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
+
+  useEffect(() => {
+    registerLink(id.current, href);
+    console.log(`${href} ${id.current} registered!`)
+
+    return () => {
+      unregisterLink(id.current);
+      console.log(`${href} ${id.current} unregistered!`)
+    }
+
+  }, [registerLink, unregisterLink])
 
 
   console.log('registerLink', registerLink)
