@@ -3,6 +3,7 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useHotNavigation } from '../context/HotNavProvider';
+import { mapIndexToKey } from '../lib/hotKeyMap';
 
 interface HotLinkProps {
   href: string;
@@ -32,7 +33,7 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElem
   useEffect(() => {
     if (!hotkeysActivated) return;
     const index = links.findIndex(link => link.id == id.current);
-    setHighlightNumber(index + 1);
+    setHighlightNumber(mapIndexToKey(index));
 
     return () => {
       setHighlightNumber(null);
