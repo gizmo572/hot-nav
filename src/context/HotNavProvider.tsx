@@ -11,7 +11,6 @@ export const useHotNavigation = () => useContext(HotNavigationContext);
 
 
 export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ children }): ReactElement => {
-  console.log('HELLO WORLD FROM HOT-NAV!!!');
   const testVar = 'GREETINGS FROM HOT-NAV!!!!';
 
   const [hotkeysActivated, setHotKeysActivated] = useState<boolean>(false);
@@ -21,16 +20,17 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
     console.log('hotkeysActivated', hotkeysActivated)
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
-      if (currentlyPressedKeysRef.current.has(key)) return;
-      console.log(`${key} PRESSED!!!`);
-      currentlyPressedKeysRef.current.add(key);
-      if (key == 'Control') {
+      if (key == 'control') {
         setHotKeysActivated((prev) => !prev);
       }
+      if (!hotkeysActivated || currentlyPressedKeysRef.current.has(key) || !/^[1-9]$/i.test(key)) return;
+      console.log(`${key} PRESSED!!!`);
+      currentlyPressedKeysRef.current.add(key);
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
+      if (!hotkeysActivated || !currentlyPressedKeysRef.current.has(key) || !/^[1-9]$/i.test(key)) return;
       console.log(`${key} LIFTED!!!`)
       currentlyPressedKeysRef.current.delete(key);
     };
@@ -43,7 +43,7 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
       document.removeEventListener('keyup', handleKeyUp);
     }
 
-  }, [hotkeysActivated, currentlyPressedKeysRef]);
+  }, [hotkeysActivated]);
 
   return (
     <HotNavigationContext.Provider value={{ testVar }} >
