@@ -7,13 +7,16 @@ import { useHotNavigation } from '../context/HotNavProvider';
 interface HotLinkProps {
   href: string;
   children: React.ReactNode;
+  [key: string]: any;
 }
 
 
-const HotLink: React.FC<HotLinkProps> = ({ href, children }): ReactElement => {
+const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElement => {
   const { registerLink, unregisterLink, hotkeysActivated, links } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
+
+  const { className, style, ...otherProps } = rest;
 
   useEffect(() => {
     registerLink(id.current, href);
@@ -40,11 +43,11 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children }): ReactElement => {
   console.log('hotkeysActivated', hotkeysActivated, 'links',links)
 
   return (
-    <Link href={href}>
+    <Link href={href} style={style} className={className}>
       {[highlightNumber && `${highlightNumber} `, children]}
     </Link>
 
-  )
+  );
 };
 
 export default HotLink;
