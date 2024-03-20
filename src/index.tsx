@@ -1,2 +1,2 @@
 export { HotNavigationProvider, useHotNavigation } from './context/HotNavProvider';
-export { default as HotLink } from './components/HotLink';
+export { default as HotterLink } from './components/HotLink';

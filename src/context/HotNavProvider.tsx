@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactElement, createContext, useContext, useEffect, useState } from 'react';
+import React, { ReactElement, createContext, useContext, useEffect, useState, useRef } from 'react';
 
 
 const HotNavigationContext = createContext({
@@ -14,19 +14,25 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
   console.log('HELLO WORLD FROM HOT-NAV!!!');
   const testVar = 'GREETINGS FROM HOT-NAV!!!!';
 
-  const [hotkeysActivated, setHotKeysActivated] = useState(false);
+  const [hotkeysActivated, setHotKeysActivated] = useState<boolean>(false);
+  const currentlyPressedKeysRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     console.log('hotkeysActivated', hotkeysActivated)
     const handleKeyDown = (e: KeyboardEvent) => {
-      console.log(`${e.key} PRESSED!!!`);
-      if (e.key == 'Control') {
+      const key = e.key.toLowerCase();
+      if (currentlyPressedKeysRef.current.has(key)) return;
+      console.log(`${key} PRESSED!!!`);
+      currentlyPressedKeysRef.current.add(key);
+      if (key == 'Control') {
         setHotKeysActivated((prev) => !prev);
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      console.log(`${e.key} LIFTED!!!`)
+      const key = e.key.toLowerCase();
+      console.log(`${key} LIFTED!!!`)
+      currentlyPressedKeysRef.current.delete(key);
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -37,7 +43,7 @@ export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ c
       document.removeEventListener('keyup', handleKeyUp);
     }
 
-  }, [hotkeysActivated]);
+  }, [hotkeysActivated, currentlyPressedKeysRef]);
 
   return (
     <HotNavigationContext.Provider value={{ testVar }} >
