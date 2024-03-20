@@ -21,11 +21,11 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElem
 
   useEffect(() => {
     registerLink(id.current, href);
-    console.log(`${href} ${id.current} registered!`)
+    // console.log(`${href} ${id.current} registered!`)
 
     return () => {
       unregisterLink(id.current);
-      console.log(`${href} ${id.current} unregistered!`)
+      // console.log(`${href} ${id.current} unregistered!`)
     }
 
   }, [registerLink, unregisterLink]);
@@ -39,9 +39,6 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElem
       setHighlightNumber(null);
     };
   }, [hotkeysActivated, links]);
-
-
-  console.log('hotkeysActivated', hotkeysActivated, 'links',links)
 
   return (
     <Link href={href} style={style} className={className}>
