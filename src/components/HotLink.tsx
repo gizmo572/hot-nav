@@ -13,7 +13,7 @@ interface HotLinkProps extends React.AriaAttributes, React.DOMAttributes<HTMLEle
 
 
 const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement => {
-  const { registerLink, unregisterLink, hotkeysActivated, links } = useHotNavigation();
+  const { registerLink, unregisterLink, hotkeysActivated, links, addCustomStyles } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
   const linkRef = useRef(null);
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
@@ -37,10 +37,9 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
       if (padding) textStyles.padding = padding;
       if (borderRadius) textStyles.borderRadius = borderRadius;
-      console.log('BR', borderRadius, 'padding', padding, textColor)
+
       const makeTextDark = textColor.startsWith('rgb(') && chroma(textColor).luminance() > 0.7 ? true : false;
       setDarkText(makeTextDark);
-
     };
 
   }, []);
@@ -70,7 +69,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         <Link 
           ref={linkRef}
           href={href}
-          style={{...style, ...(hotkeysActivated ? textStyles : {})}}
+          style={{...style, ...(hotkeysActivated && addCustomStyles ? textStyles : {})}}
           className={className || ''}
           {...otherProps}
         >
@@ -78,7 +77,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         </Link> :
         <button
           ref={linkRef}
-          style={{...style, ...(hotkeysActivated ? textStyles : {})}}
+          style={{...style, ...(hotkeysActivated && addCustomStyles ? textStyles : {})}}
           className={className || ''}
           {...otherProps}
         >

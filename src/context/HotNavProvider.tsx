@@ -14,6 +14,7 @@ interface HotNavContextType {
   unregisterLink: (id: string) => void;
   hotkeysActivated: boolean;
   links: _Link[];
+  addCustomStyles: boolean;
 }
 
 
@@ -22,12 +23,13 @@ const HotNavigationContext = createContext<HotNavContextType>({
   unregisterLink: () => {},
   hotkeysActivated: false,
   links: [],
+  addCustomStyles: true,
 });
 
 export const useHotNavigation = () => useContext(HotNavigationContext);
 
 
-export const HotNavigationProvider: React.FC<{children: any}> = ({ children }): ReactElement => {
+export const HotNavigationProvider: React.FC<{children: any, addCustomStyles: boolean}> = ({ children, addCustomStyles=true }): ReactElement => {
   const [links, setLinks] = useState<_Link[]>([]);
   const [hotkeysActivated, setHotKeysActivated] = useState<boolean>(false);
   const [routerDebounce, setRouterDebounce] = useState<boolean>(false);
@@ -87,7 +89,7 @@ export const HotNavigationProvider: React.FC<{children: any}> = ({ children }): 
   }, [hotkeysActivated, routerDebounce, router, links]);
 
   return (
-    <HotNavigationContext.Provider value={{ registerLink, unregisterLink, hotkeysActivated, links }} >
+    <HotNavigationContext.Provider value={{ registerLink, unregisterLink, hotkeysActivated, links, addCustomStyles }} >
       {children}
     </HotNavigationContext.Provider>
   );
