@@ -29,9 +29,9 @@ const HotNavigationContext = createContext<HotNavContextType>({
 export const useHotNavigation = () => useContext(HotNavigationContext);
 
 
-export const HotNavigationProvider: React.FC<{children: any, addCustomStyles: boolean}> = ({ children, addCustomStyles=true }): ReactElement => {
+export const HotNavigationProvider: React.FC<{children: any, addCustomStyles: boolean, defaultHotKeysOn: boolean}> = ({ children, addCustomStyles=true, defaultHotKeysOn=false }): ReactElement => {
   const [links, setLinks] = useState<_Link[]>([]);
-  const [hotkeysActivated, setHotKeysActivated] = useState<boolean>(false);
+  const [hotkeysActivated, setHotKeysActivated] = useState<boolean>(defaultHotKeysOn);
   const [routerDebounce, setRouterDebounce] = useState<boolean>(false);
   const currentlyPressedKeysRef = useRef<Set<string>>(new Set());
 
