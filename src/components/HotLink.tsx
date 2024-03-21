@@ -19,19 +19,28 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
   const [darkText, setDarkText] =useState<boolean>(false);
 
+  const { className, href, style, ...otherProps } = rest;
+
   const textStyles = {
     color: darkText ? 'navy' : 'yellow',
     background: darkText ? 'yellow' : 'navy',
-    WebkitTextFillColor: darkText ? 'navy' : 'yellow'
+    WebkitTextFillColor: darkText ? 'navy' : 'yellow',
+    borderRadius: '5px',
+    padding: '5px',
   }
-  const { className, href, style, ...otherProps } = rest;
 
   useEffect(() => {
     if (linkRef.current) {
       const textColor = window.getComputedStyle(linkRef.current).color;
-  
-      const makeTextDark = chroma(textColor).luminance() > 0.7 ? true : false;
+      const padding = window.getComputedStyle(linkRef.current).padding;
+      const borderRadius = window.getComputedStyle(linkRef.current).borderRadius;
+
+      if (padding) textStyles.padding = padding;
+      if (borderRadius) textStyles.borderRadius = borderRadius;
+      console.log('BR', borderRadius, 'padding', padding, textColor)
+      const makeTextDark = textColor.startsWith('rgb(') && chroma(textColor).luminance() > 0.7 ? true : false;
       setDarkText(makeTextDark);
+
     };
 
   }, []);
