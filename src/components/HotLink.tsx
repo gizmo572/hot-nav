@@ -4,8 +4,9 @@ import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useHotNavigation } from '../context/HotNavProvider';
 import { mapIndexToKey } from '../lib/hotKeyMap';
+import chroma from 'chroma-js';
 
-interface HotLinkProps {
+interface HotLinkProps extends React.AriaAttributes, React.DOMAttributes<HTMLElement> {
   href: string;
   children: React.ReactNode;
   [key: string]: any;
@@ -15,9 +16,27 @@ interface HotLinkProps {
 const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElement => {
   const { registerLink, unregisterLink, hotkeysActivated, links } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
+  const linkRef = useRef(null);
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
+  const [darkText, setDarkText] =useState<boolean>(false);
+
+  const textStyles = {
+    color: darkText ? 'navy' : 'yellow',
+    background: darkText ? 'yellow' : 'navy',
+    WebkitTextFillColor: darkText ? 'navy' : 'yellow'
+  }
 
   const { className, style, ...otherProps } = rest;
+
+  useEffect(() => {
+    if (linkRef.current) {
+      const textColor = window.getComputedStyle(linkRef.current).color;
+  
+      const makeTextDark = chroma(textColor).luminance() > 0.7 ? true : false;
+      setDarkText(makeTextDark);
+    };
+
+  }, []);
 
   useEffect(() => {
     registerLink(id.current, href);
@@ -41,7 +60,12 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElem
   }, [hotkeysActivated, links]);
 
   return (
-    <Link href={href} style={style} className={className}>
+    <Link 
+      ref={linkRef}
+      href={href}
+      style={{...style, ...(hotkeysActivated ? textStyles : {})}}
+      className={className || ''}
+    >
       {[highlightNumber && `${highlightNumber} `, children]}
     </Link>
 
