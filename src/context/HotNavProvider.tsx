@@ -27,7 +27,7 @@ const HotNavigationContext = createContext<HotNavContextType>({
 export const useHotNavigation = () => useContext(HotNavigationContext);
 
 
-export const HotNavigationProvider: React.FC<{children: React.ReactNode}> = ({ children }): ReactElement => {
+export const HotNavigationProvider: React.FC<{children: any}> = ({ children }): ReactElement => {
   const [links, setLinks] = useState<_Link[]>([]);
   const [hotkeysActivated, setHotKeysActivated] = useState<boolean>(false);
   const [routerDebounce, setRouterDebounce] = useState<boolean>(false);

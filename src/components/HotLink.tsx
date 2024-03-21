@@ -2,18 +2,17 @@
 
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import chroma from 'chroma-js';
 import { useHotNavigation } from '../context/HotNavProvider';
 import { mapIndexToKey } from '../lib/hotKeyMap';
-import chroma from 'chroma-js';
 
 interface HotLinkProps extends React.AriaAttributes, React.DOMAttributes<HTMLElement> {
-  href: string;
-  children: React.ReactNode;
+  children: any;
   [key: string]: any;
 }
 
 
-const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElement => {
+const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement => {
   const { registerLink, unregisterLink, hotkeysActivated, links } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
   const linkRef = useRef(null);
@@ -25,8 +24,7 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElem
     background: darkText ? 'yellow' : 'navy',
     WebkitTextFillColor: darkText ? 'navy' : 'yellow'
   }
-
-  const { className, style, ...otherProps } = rest;
+  const { className, href, style, ...otherProps } = rest;
 
   useEffect(() => {
     if (linkRef.current) {
@@ -40,11 +38,9 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElem
 
   useEffect(() => {
     registerLink(id.current, href);
-    // console.log(`${href} ${id.current} registered!`)
 
     return () => {
       unregisterLink(id.current);
-      // console.log(`${href} ${id.current} unregistered!`)
     }
 
   }, [registerLink, unregisterLink]);
@@ -60,14 +56,27 @@ const HotLink: React.FC<HotLinkProps> = ({ href, children, ...rest }): ReactElem
   }, [hotkeysActivated, links]);
 
   return (
-    <Link 
-      ref={linkRef}
-      href={href}
-      style={{...style, ...(hotkeysActivated ? textStyles : {})}}
-      className={className || ''}
-    >
-      {[highlightNumber && `${highlightNumber} `, children]}
-    </Link>
+    <>
+      {href ?
+        <Link 
+          ref={linkRef}
+          href={href}
+          style={{...style, ...(hotkeysActivated ? textStyles : {})}}
+          className={className || ''}
+          {...otherProps}
+        >
+          {[highlightNumber && `${highlightNumber} `, children]}
+        </Link> :
+        <button
+          ref={linkRef}
+          style={{...style, ...(hotkeysActivated ? textStyles : {})}}
+          className={className || ''}
+          {...otherProps}
+        >
+          {[highlightNumber && `${highlightNumber} `, children]}
+        </button>
+      }
+    </>
 
   );
 };
