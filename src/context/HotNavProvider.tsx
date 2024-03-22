@@ -17,6 +17,11 @@ interface HotNavContextType {
   addCustomStyles: boolean;
 }
 
+interface HotNavProviderProps extends React.AriaAttributes, React.DOMAttributes<HTMLElement> {
+  children: any;
+  [key: string]: any;
+}
+
 
 const HotNavigationContext = createContext<HotNavContextType>({
   registerLink: () => {},
@@ -29,7 +34,8 @@ const HotNavigationContext = createContext<HotNavContextType>({
 export const useHotNavigation = () => useContext(HotNavigationContext);
 
 
-export const HotNavigationProvider: React.FC<{children: any, addCustomStyles: boolean, defaultHotKeysOn: boolean}> = ({ children, addCustomStyles=true, defaultHotKeysOn=false }): ReactElement => {
+export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children, ...otherProps }): ReactElement => {
+  const {addCustomStyles=true, defaultHotKeysOn=true } = otherProps;
   const [links, setLinks] = useState<_Link[]>([]);
   const [hotkeysActivated, setHotKeysActivated] = useState<boolean>(defaultHotKeysOn);
   const [routerDebounce, setRouterDebounce] = useState<boolean>(false);
