@@ -19,6 +19,9 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
   const [darkText, setDarkText] = useState<boolean>(true);
   const [textColorRegistered, setTextColorRegistered] = useState<boolean>(false);
+  const [childIsButton, setChildIsButton] = useState<boolean | null>(null);
+  const [childrenForBtn, setChildrenForBtn] = useState()
+  const [containsImage, setContainsImage] = useState(false);
 
   const { className, href, style, ...otherProps } = rest;
 
@@ -30,16 +33,41 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     padding: '5px',
   }
 
+  const btnStyles = {
+    textAlign: 'center',
+  }
+
   useEffect(() => {
+    const newChildren = React.Children.map(children, (child) => {
+      if (React.isValidElement(child)) {
+        console.log('child', href, child)
+        const childProps = child.props as { children?: React.ReactNode }
+        if ('src' in childProps) setContainsImage(true);
+        if (typeof childProps.children === 'string') {
+          return React.cloneElement(child, {
+            ...childProps,
+            children: `${highlightNumber} ${childProps.children}`,
+          } as any)
+        }
+      }
+      return child;
+    })
+    setChildrenForBtn(newChildren);
+  }, [highlightNumber, childIsButton])
+  
+  useEffect(() => {
+    let btnFound = false;
+    React.Children.forEach(children, child => {
+      if (React.isValidElement(child) && child.type === 'button') {
+        btnFound = true;
+        return;
+      };
+    });
+    setChildIsButton(btnFound);
+
     if (linkRef.current) {
       const textColor = window.getComputedStyle(linkRef.current).color;
-      const padding = window.getComputedStyle(linkRef.current).padding;
-      const borderRadius = window.getComputedStyle(linkRef.current).borderRadius;
-
-      if (padding) textStyles.padding = padding;
-      if (borderRadius) textStyles.borderRadius = borderRadius;
-
-      const makeTextDark = textColor.startsWith('rgb(') && chroma(textColor).luminance() > 0.7 ? true : false;
+      const makeTextDark = textColor.startsWith('rgb(') && chroma(textColor).luminance() > 0.6 ? true : false;
       setDarkText(makeTextDark);
       setTextColorRegistered(true);
     };
@@ -68,23 +96,32 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   return (
     <>
       {href ?
-        <Link 
+        <Link
           ref={linkRef}
           href={href}
-          style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered ? textStyles : {})}}
+          style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered && !containsImage? textStyles : {}), ...(containsImage && {fontWeight: 'bolder'})}}
           className={className || ''}
           {...otherProps}
         >
           {[highlightNumber && `${highlightNumber} `, children]}
         </Link> :
+      childIsButton === false ?
         <button
           ref={linkRef}
-          style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered ? textStyles : {})}}
+          style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered ? btnStyles : {})}}
           className={className || ''}
           {...otherProps}
         >
           {[highlightNumber && `${highlightNumber} `, children]}
-        </button>
+        </button> :
+        <div
+          ref={linkRef}
+          style={style}
+          className={className || ''}
+          {...otherProps}
+        >
+          {[highlightNumber ? childrenForBtn : children]}
+        </div>
       }
     </>
 
