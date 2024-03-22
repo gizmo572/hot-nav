@@ -37,12 +37,13 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     textAlign: 'center',
   }
 
+  
   useEffect(() => {
+    if (!childIsButton) return;
     const newChildren = React.Children.map(children, (child) => {
       if (React.isValidElement(child)) {
         console.log('child', href, child)
-        const childProps = child.props as { children?: React.ReactNode }
-        if ('src' in childProps) setContainsImage(true);
+        const childProps = child.props as { children?: React.ReactNode };
         if (typeof childProps.children === 'string') {
           return React.cloneElement(child, {
             ...childProps,
@@ -58,6 +59,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   useEffect(() => {
     let btnFound = false;
     React.Children.forEach(children, child => {
+      const childProps = child.props as { children?: React.ReactNode };
+      if (childProps && 'src' in childProps) setContainsImage(true);
       if (React.isValidElement(child) && child.type === 'button') {
         btnFound = true;
         return;
