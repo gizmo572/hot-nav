@@ -17,7 +17,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   const id = useRef<string>(crypto.randomUUID());
   const linkRef = useRef(null);
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
-  const [darkText, setDarkText] =useState<boolean>(false);
+  const [darkText, setDarkText] = useState<boolean>(true);
+  const [textColorRegistered, setTextColorRegistered] = useState<boolean>(false);
 
   const { className, href, style, ...otherProps } = rest;
 
@@ -40,6 +41,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
       const makeTextDark = textColor.startsWith('rgb(') && chroma(textColor).luminance() > 0.7 ? true : false;
       setDarkText(makeTextDark);
+      setTextColorRegistered(true);
     };
 
   }, []);
@@ -69,7 +71,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         <Link 
           ref={linkRef}
           href={href}
-          style={{...style, ...(hotkeysActivated && addCustomStyles ? textStyles : {})}}
+          style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered ? textStyles : {})}}
           className={className || ''}
           {...otherProps}
         >
@@ -77,7 +79,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         </Link> :
         <button
           ref={linkRef}
-          style={{...style, ...(hotkeysActivated && addCustomStyles ? textStyles : {})}}
+          style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered ? textStyles : {})}}
           className={className || ''}
           {...otherProps}
         >
