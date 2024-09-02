@@ -16,6 +16,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   const { registerLink, unregisterLink, hotkeysActivated, links, addCustomStyles } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
   const linkRef = useRef(null);
+  const linkHRef = useRef(rest.href);
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
   const [darkText, setDarkText] = useState<boolean>(true);
   const [textColorRegistered, setTextColorRegistered] = useState<boolean>(false);
@@ -55,17 +56,42 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     })
     setChildrenForBtn(newChildren);
   }, [highlightNumber, childIsButton])
-  
+
+
+  // the only situation where we actually implement this logic is when there are children components on the HotLink component
   useEffect(() => {
     let btnFound = false;
-    React.Children.forEach(children, child => {
-      const childProps = child.props as { children?: React.ReactNode };
-      if (childProps && 'src' in childProps) setContainsImage(true);
-      if (React.isValidElement(child) && child.type === 'button') {
-        btnFound = true;
-        return;
-      };
-    });
+    let hrefFound = false;
+
+    const analyzeChildrenComponents = async (children: any) => {
+      React.Children.forEach(children, child => {
+        if (hrefFound === true) return;
+        const childProps = child.props;
+        if (typeof childProps != 'object') return;
+
+        if (Object.hasOwn(childProps, 'src')) setContainsImage(true);
+        if (Object.hasOwn(childProps, 'href')) {
+          linkHRef.current = childProps.href;
+          hrefFound = true;
+          return;
+        }
+        console.log('child type', child.type, typeof child.type)
+        if (typeof child.type === 'function') {
+          const x = child.type({children})
+          analyzeChildrenComponents(x);
+        }
+  
+        if (React.isValidElement(child) && child.type === 'button') {
+          btnFound = true;
+          return;
+        };
+        if (Object.hasOwn(childProps, 'children') && childProps.children && typeof childProps.children != 'string') {
+          alert(childProps.children)
+          analyzeChildrenComponents(childProps.children);
+        }
+      });
+    }
+    analyzeChildrenComponents(children);
     setChildIsButton(btnFound);
 
     if (linkRef.current) {
@@ -78,13 +104,14 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   }, []);
 
   useEffect(() => {
-    registerLink(id.current, href);
+    // if (!linkHRef.current) return;
+    registerLink(id.current, linkHRef.current);
 
     return () => {
       unregisterLink(id.current);
     }
 
-  }, [registerLink, unregisterLink]);
+  }, [registerLink, unregisterLink, linkHRef.current]);
 
   useEffect(() => {
     if (!hotkeysActivated) return;
@@ -101,7 +128,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
       {href ?
         <Link
           ref={linkRef}
-          href={href}
+          href={linkHRef.current}
           style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered && !containsImage? textStyles : {}), ...(containsImage && {fontWeight: 'bolder'})}}
           className={className || ''}
           {...otherProps}
