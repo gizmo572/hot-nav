@@ -83,8 +83,10 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         }
         if (!onClickFound && Object.hasOwn(childProps, 'onClick')) {
           onClickRef.current = childProps.onClick;
+          onClickFound = true;
         } else if (!onClickFound && Object.hasOwn(childProps, 'handleClick')) {
           onClickRef.current = childProps.handleClick;
+          onClickFound = true;
         }
 
         console.log('child type', child.type, typeof child.type)
@@ -95,11 +97,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
             analyzeChildrenComponents(x);
           }
         }
-  
-        if (React.isValidElement(child) && child.type === 'button') {
-          btnFound = true;
-          return;
-        };
+
         if (Object.hasOwn(childProps, 'children') && childProps.children && typeof childProps.children != 'string') {
           analyzeChildrenComponents(childProps.children);
         }
