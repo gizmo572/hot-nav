@@ -87,9 +87,9 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
         console.log('child type', child.type, typeof child.type)
         if (typeof child.type === 'function') {
-          const x = child.type({children})
-          if (!seen.includes(x.name)) {
-            seen.push(x.name);
+          const x = child.type.prototype ? new child.type({children}).render() : child.type({children})
+          if (!seen.includes(child.type.name)) {
+            seen.push(child.type.name);
             analyzeChildrenComponents(x);
           }
         }
