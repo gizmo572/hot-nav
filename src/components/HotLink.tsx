@@ -83,6 +83,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         }
         if (!onClickFound && Object.hasOwn(childProps, 'onClick')) {
           onClickRef.current = childProps.onClick;
+        } else if (!onClickFound && Object.hasOwn(childProps, 'handleClick')) {
+          onClickRef.current = childProps.handleClick;
         }
 
         console.log('child type', child.type, typeof child.type)

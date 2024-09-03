@@ -77,7 +77,7 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
           const onClick = links[index].onClick
           if (onClick) onClick();
         }
-        router.push(links[index].href);
+        if (links[index].href) router.push(links[index].href);
       }
       setRouterDebounce(true);
     };
@@ -89,7 +89,7 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
       if (hotkeysActivated && !routerDebounce && /^[1-9]$/i.test(e.key) && parseInt(e.key) <= links.length) {
         const link = links[parseInt(key) - 1];
         if (link.onClick) link.onClick();
-        router.push(links[parseInt(key) - 1].href);
+        if (link.href) router.push(link.href);
       };
     };
 
