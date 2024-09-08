@@ -2,6 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "outDir": "./dist/cjs"
-  }
+    "outDir": "./dist/cjs",
+    "jsx": "react",
+    "declaration": true,
+    "declarationDir": "./dist/cjs",
+    "allowJs": true
+  },
+  "include": ["src/**/*"]
 }

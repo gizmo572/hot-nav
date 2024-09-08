@@ -4,11 +4,11 @@
   "description": "intuitive accessibility hot keys",
   "type": "module",
   "exports": {
-    "import": "./dist/esm/index.jsx",
-    "require": "./dist/cjs/index.jsx"
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
   },
-  "main": "dist/cjs/index.jsx",
-  "module": "dist/esm/index.jsx",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "files": [
     "dist/cjs",
     "dist/esm"
