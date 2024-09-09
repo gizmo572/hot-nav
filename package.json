@@ -1,6 +1,6 @@
 {
   "name": "hot-nav",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "intuitive accessibility hot keys",
   "type": "module",
   "exports": {
