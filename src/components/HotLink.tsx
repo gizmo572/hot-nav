@@ -113,7 +113,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
       setTextColorRegistered(true);
     };
 
-  }, []);
+  }, [children]);
 
   useEffect(() => {
     registerLink(id.current, linkHRef.current, onClickRef.current);
