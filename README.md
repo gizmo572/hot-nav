@@ -4,7 +4,7 @@ Hot-Nav is an accessibility library for adding hotkey functionality to Next.js a
 
 ## Instructions
 
-Install the hot-nav package in the root of your application:
+Install the hot-nav package in the body of your application:
 
 ```js
 npm install hot-nav
@@ -130,3 +130,8 @@ Now that was extreme! And what in the heck was that button element doing there? 
 The hotkey implementation is simple: a unique number is placed directly to the left of each HotLink-wrapped component on the page. These numbers are in incrementing order, so if there are 5 HotLink components, the numbers 1 through 5 will be used as hotkeys. When the user presses and releases a number that is a hotkey, the corresponding component is 'clicked'. 
 
 But what if there are more than 9 components? In this case, multi-digit hotkeys are implemented: 12, 13, 14, 15, etc. In these cases, the user must hold down the '1' key, then press the respective 2nd key. In the case of multi-digit hotkeys, simply pressing down the 2nd key will trigger the 'click' (as opposed to the release of the key triggering the 'click'). A concern here might be that lifting the 2 keys that are still pressed might trigger additional hotkeys, but debouncing has been implemented to disable all hotkeys after a click event until all keys have been lifted.
+
+
+## Demo
+
+![demo](https://imgur.com/7m6ra2M.gif)
