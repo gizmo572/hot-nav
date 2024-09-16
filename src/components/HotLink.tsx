@@ -43,6 +43,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   useEffect(() => {
     if (!childIsButton) return;
     const getNewChildren = (children: React.ReactNode): React.ReactNode => {
+
+      // accepts a React element (button) and returns a clone of this element with the hotkey number prepended to the children
       const addHighlightNumber = (element: React.ReactElement) => {
         return React.cloneElement(
           element,
@@ -55,7 +57,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
           </>
         );
       };
-    
+
+      // recursively clones the children of a HotLink component that is wrapping a button element and prepends the hotkey number to the children of the button
       return React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           if (child.type === 'button' || child.type === 'a' || (typeof child.type === 'object' && 'displayName' in child.type && (child.type as any).displayName === 'Button')) {
