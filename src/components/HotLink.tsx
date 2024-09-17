@@ -25,7 +25,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   const [childrenForBtn, setChildrenForBtn] = useState<React.ReactNode | null>(null);
   const [containsImage, setContainsImage] = useState(false);
 
-  const { className, href, style, ...otherProps } = rest;
+  const { className, href, style, onClick, ...otherProps } = rest;
 
   const textStyles = {
     color: darkText ? 'navy' : 'yellow',
@@ -46,10 +46,10 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
       // accepts a React element (button) and returns a clone of this element with the hotkey number prepended to the children
       const addHighlightNumber = (element: React.ReactElement) => {
-
+        const { href, onClick, handleClick, ...otherProps } = element.props;
         return React.cloneElement(
           element,
-          element.props,
+          {...otherProps, onClick: undefined, handleClick: undefined},
           <>
             <span className="highlight-number whitespace-pre">
               {highlightNumber}&nbsp;
@@ -65,7 +65,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
           if (child.type === 'button' || child.type === 'a' || (typeof child.type === 'object' && 'displayName' in child.type && (child.type as any).displayName === 'Button')) {
             return addHighlightNumber(child);
           } else if (React.isValidElement(child.props.children) || Array.isArray(child.props.children)) {
-            return React.cloneElement(child, {}, getNewChildren(child.props.children));
+            const { href, onClick, handleClick, ...otherProps } = child.props;
+            return React.cloneElement(child, {...otherProps, onClick: undefined, handleClick: undefined}, getNewChildren(child.props.children));
           }
         }
         return child;
@@ -82,9 +83,9 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     let onClickFound = false;
     const seen: any[] = []
     
-    if (Object.hasOwn(otherProps, 'onClick') && typeof otherProps.onClick === 'function') {
+    if (onClick && typeof onClick === 'function') {
       onClickFound = true;
-      onClickRef.current = otherProps.onClick;
+      onClickRef.current = onClick;
     }
 
     if (href) {
@@ -162,7 +163,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         <Link
           ref={linkRef as React.Ref<HTMLAnchorElement>}
           href={hrefRef.current}
-          onClick={onClickRef.current || (() => {})}
+          onClick={highlightNumber || onClick ? (e: React.MouseEvent<HTMLAnchorElement>) => { e.stopPropagation(); onClickRef.current ? onClickRef.current(e) : (() => {}) } : undefined}
           style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered && !containsImage? textStyles : {}), ...(containsImage && {fontWeight: 'bolder'})}}
           className={className || ''}
           {...otherProps}
@@ -172,7 +173,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
       childIsButton === false ?
         <button
           ref={linkRef as React.Ref<HTMLButtonElement>}
-          onClick={onClickRef.current || (() => {})}
+          onClick={highlightNumber || onclick ? (e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onClickRef.current ? onClickRef.current(e) : (() => {}) } : undefined}
           style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered ? btnStyles : {})}}
           className={className || ''}
           {...otherProps}
@@ -181,7 +182,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         </button> :
         <div
           ref={linkRef as React.Ref<HTMLDivElement>}
-          onClick={onClickRef.current || (() => {})}
+          onClick={highlightNumber || onClick ? (e: React.MouseEvent<HTMLDivElement>) => { e.stopPropagation(); onClickRef.current ? onClickRef.current(e) : (() => {}) } : undefined}
           style={style}
           className={className || ''}
           {...otherProps}
