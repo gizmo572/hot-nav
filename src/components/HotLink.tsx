@@ -16,15 +16,14 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   const { registerLink, unregisterLink, hotkeysActivated, links, addCustomStyles } = useHotNavigation();
   const id = useRef<string>(crypto.randomUUID());
   const linkRef = useRef<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | null>(null);
-  const childWithHref = useRef<HTMLElement | null>(null);
-  const childWithOnClick = useRef<HTMLElement | null>(null);
+  const hrefRef = useRef<string | null>(null);
+  const onClickRef = useRef<React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement> | null>(null);
   const [highlightNumber, setHighlightNumber] = useState<number | null>(null);
   const [darkText, setDarkText] = useState<boolean>(true);
   const [textColorRegistered, setTextColorRegistered] = useState<boolean>(false);
   const [childIsButton, setChildIsButton] = useState<boolean | null>(null);
   const [childrenForBtn, setChildrenForBtn] = useState<React.ReactNode | null>(null);
   const [containsImage, setContainsImage] = useState(false);
-  const [childHasClickAttribute, setChildHasClickAttribute] = useState(false);
 
   const { className, href, style, ...otherProps } = rest;
 
@@ -40,13 +39,6 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     textAlign: 'center',
   }
 
-  const setChildRef = (refThatWasFound: React.RefObject<HTMLElement>) => (el: HTMLElement | null) => {
-    if (refThatWasFound === childWithHref) {
-      childWithHref.current = el;
-    } else if (refThatWasFound === childWithOnClick) {
-      childWithOnClick.current = el;
-    }
-  }
   
   useEffect(() => {
     if (!childIsButton) return;
@@ -54,19 +46,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
       // accepts a React element (button) and returns a clone of this element with the hotkey number prepended to the children
       const addHighlightNumber = (element: React.ReactElement) => {
-        if (childHasClickAttribute && (element.props.href || element.props.onClick || element.props.handleClick)) {
-          const refThatWasFound = element.props.href ? childWithHref : childWithOnClick;
-          return React.cloneElement(
-            element,
-            {...element.props, ref: setChildRef(refThatWasFound)},
-            <>
-              <span className="highlight-number whitespace-pre">
-                {highlightNumber}&nbsp;
-              </span>
-              {getNewChildren(element.props.children)}
-            </>
-          );
-        }
+
         return React.cloneElement(
           element,
           element.props,
@@ -93,7 +73,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     };
     const newChildren = getNewChildren(children);
     setChildrenForBtn(newChildren);
-  }, [highlightNumber, childIsButton, childHasClickAttribute])
+  }, [highlightNumber, childIsButton])
 
 
   useEffect(() => {
@@ -104,6 +84,12 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     
     if (Object.hasOwn(otherProps, 'onClick') && typeof otherProps.onClick === 'function') {
       onClickFound = true;
+      onClickRef.current = otherProps.onClick;
+    }
+
+    if (href) {
+      hrefFound = true;
+      hrefRef.current = href;
     }
 
     const analyzeChildrenComponents = async (children: any) => {
@@ -114,9 +100,11 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         if (Object.hasOwn(childProps, 'src')) setContainsImage(true);
         if (!hrefFound && Object.hasOwn(childProps, 'href')) {
           hrefFound = true;
+          hrefRef.current = childProps.href;
         }
         if (!onClickFound && (Object.hasOwn(childProps, 'onClick') || Object.hasOwn(childProps, 'handleClick'))) {
           onClickFound = true;
+          onClickRef.current = childProps.onClick || childProps.handleClick;
         }
         if (child.type === 'button' || (typeof child.type === 'object' && child.type.displayName === 'Button')) btnFound = true;
         if (typeof child.type === 'function') {
@@ -134,7 +122,6 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     }
     analyzeChildrenComponents(children);
     setChildIsButton(btnFound);
-    setChildHasClickAttribute(onClickFound || hrefFound);
 
     if (linkRef.current) {
       const textColor = window.getComputedStyle(linkRef.current).color;
@@ -149,12 +136,6 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     const simulateClick = () => {
       if (linkRef.current) {
         linkRef.current.click();
-      }
-      if (childWithHref.current) {
-        childWithHref.current.click();
-      }
-      if (childWithOnClick.current) {
-        childWithOnClick.current.click();
       }
     }
     registerLink(id.current, simulateClick);
@@ -177,10 +158,11 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
   return (
     <>
-      {href ?
+      {hrefRef.current ?
         <Link
           ref={linkRef as React.Ref<HTMLAnchorElement>}
-          href={href}
+          href={hrefRef.current}
+          onClick={onClickRef.current || (() => {})}
           style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered && !containsImage? textStyles : {}), ...(containsImage && {fontWeight: 'bolder'})}}
           className={className || ''}
           {...otherProps}
@@ -190,6 +172,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
       childIsButton === false ?
         <button
           ref={linkRef as React.Ref<HTMLButtonElement>}
+          onClick={onClickRef.current || (() => {})}
           style={{...style, ...(hotkeysActivated && addCustomStyles && textColorRegistered ? btnStyles : {})}}
           className={className || ''}
           {...otherProps}
@@ -198,6 +181,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         </button> :
         <div
           ref={linkRef as React.Ref<HTMLDivElement>}
+          onClick={onClickRef.current || (() => {})}
           style={style}
           className={className || ''}
           {...otherProps}
