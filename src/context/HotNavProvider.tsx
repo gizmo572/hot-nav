@@ -6,12 +6,11 @@ import { mapKeyToIndex } from '../lib/hotKeyMap';
 
 interface _Link {
   id: string;
-  href: string;
-  onClick: Function | null;
+  simulateClick: Function;
 };
 
 interface HotNavContextType {
-  registerLink: (href: string, id: string, onClick: Function | null) => void;
+  registerLink: (id: string, simulateClick: Function) => void;
   unregisterLink: (id: string) => void;
   hotkeysActivated: boolean;
   links: _Link[];
@@ -44,8 +43,8 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
 
   const router = useRouter();
 
-  const registerLink = useCallback((id: string, href: string, onClick: Function | null) => {
-    setLinks((prev) => [...prev, { id, href, onClick }]);
+  const registerLink = useCallback((id: string, simulateClick: Function) => {
+    setLinks((prev) => [...prev, { id, simulateClick }]);
   }, []);
 
   const unregisterLink = useCallback((id: string) => {
@@ -73,11 +72,7 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
       };
       const index = mapKeyToIndex(parseInt(currentlyPressedKey + key));
       if (index && index >= 0 && index < links.length) {
-        if (links[index].onClick) {
-          const onClick = links[index].onClick
-          if (onClick) onClick();
-        }
-        if (links[index].href) router.push(links[index].href);
+        links[index].simulateClick();
       }
       setRouterDebounce(true);
     };
@@ -88,8 +83,7 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
       currentlyPressedKeysRef.current.delete(key);
       if (hotkeysActivated && !routerDebounce && /^[1-9]$/i.test(e.key) && parseInt(e.key) <= links.length) {
         const link = links[parseInt(key) - 1];
-        if (link.onClick) link.onClick();
-        if (link.href) router.push(link.href);
+        link.simulateClick();
       };
     };
 
