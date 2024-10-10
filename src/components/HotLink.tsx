@@ -11,10 +11,24 @@ interface HotLinkProps extends React.AriaAttributes, React.DOMAttributes<HTMLEle
   [key: string]: any;
 }
 
+function generateUUID() {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  } else {
+    // Fallback for browsers that do not support crypto.randomUUID()
+    // You can use uuid library or another method here
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = (Math.random() * 16) | 0,
+        v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+}
+
 
 const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement => {
   const { registerLink, unregisterLink, hotkeysActivated, links, addCustomStyles } = useHotNavigation();
-  const id = useRef<string>(crypto.randomUUID());
+  const id = useRef<string>(generateUUID());
   const linkRef = useRef<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement | null>(null);
   const hrefRef = useRef<string | null>(null);
   const onClickRef = useRef<React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement> | null>(null);
@@ -53,7 +67,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
           element,
           {...otherProps, onClick: undefined},
           <>
-            <span className="highlight-number whitespace-pre">
+            <span>
               {highlightNumber}&nbsp;
             </span>
             {getNewChildren(element.props.children)}
@@ -99,7 +113,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
     const analyzeChildrenComponents = async (children: any) => {
       React.Children.forEach(children, child => {
-        const childProps = child.props;
+        const childProps = child?.props;
         if (typeof childProps != 'object') return;
 
         if (Object.hasOwn(childProps, 'src')) setContainsImage(true);
@@ -166,10 +180,10 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
 
   return (
     <>
-      {hrefRef.current ?
+      {href || hrefRef.current ?
         <Link
           ref={linkRef as React.Ref<HTMLAnchorElement>}
-          href={hrefRef.current}
+          href={href || hrefRef.current}
           onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
             if (highlightNumber) {
               onClickRef.current && onClickRef.current(e);
@@ -181,9 +195,9 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
           className={className || ''}
           {...otherProps}
         >
-          <div style={highlightNumber ? {pointerEvents: 'none'} : {}}>
-            {[highlightNumber && `${highlightNumber} `, children]}
-          </div>
+          <span style={highlightNumber ? {pointerEvents: 'none'} : {}}>
+            {[highlightNumber && `${highlightNumber} `, children, ' 1']}
+          </span>
         </Link> :
       childIsButton === false ?
         <button
@@ -199,13 +213,13 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
           className={className || ''}
           {...otherProps}
         >
-          <div style={highlightNumber ? {pointerEvents: 'none'} : {}}>
-            {[highlightNumber && highlightNumber, children]}
-          </div>
+          <span style={highlightNumber ? {pointerEvents: 'none'} : {}}>
+            {[highlightNumber && `${highlightNumber} `, children, ' 2']}
+          </span>
         </button> :
         <div
           ref={linkRef as React.Ref<HTMLDivElement>}
-          onClick={highlightNumber || onClick ? (e: React.MouseEvent<HTMLDivElement>) => { e.stopPropagation(); onClickRef.current ? onClickRef.current(e) : (() => {}) } : undefined}
+          onClick={highlightNumber || onClick ? (e: React.MouseEvent<HTMLDivElement>) => { onClickRef.current ? onClickRef.current(e) : (() => {}) } : undefined}
           style={style}
           className={className || ''}
           {...otherProps}
