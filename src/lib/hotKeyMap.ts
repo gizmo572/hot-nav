@@ -25,7 +25,6 @@ export function mapIndexToKey(index: number) {
 };
 
 export function mapKeyToIndex(key: number) {
-  console.log('mapk2i key: ', key)
   if (key === null || key <= 0) {
     return -1;
   } else if (key <= 9) {  // idx 0-8

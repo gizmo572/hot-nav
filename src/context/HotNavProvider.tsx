@@ -52,7 +52,25 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
   }, []);
 
   useEffect(() => {
-    // console.log('hotkeysActivated', hotkeysActivated, currentlyPressedKeysRef.current)
+    const handleVisibilityChange = () => {
+      // TODO: possibly reset keys on 'blur' and/or 'focus' changes as well
+      if (document.visibilityState === 'hidden') {
+        // Clear the cache of currently pressed keys when the page leaves focus
+        currentlyPressedKeysRef.current.clear();
+        setRouterDebounce(false);
+      }
+    };
+
+    // Add the event listener
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
       if (key == 'control') {
@@ -80,11 +98,11 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
     const handleKeyUp = (e: KeyboardEvent) => {
       if (routerDebounce && currentlyPressedKeysRef.current.size == 1) setRouterDebounce(false);
       const key = e.key.toLowerCase();
-      currentlyPressedKeysRef.current.delete(key);
-      if (hotkeysActivated && !routerDebounce && /^[1-9]$/i.test(e.key) && parseInt(e.key) <= links.length) {
+      if (hotkeysActivated && !routerDebounce && /^[1-9]$/i.test(key) && parseInt(key) <= links.length) {
         const link = links[parseInt(key) - 1];
         link.simulateClick();
       };
+      currentlyPressedKeysRef.current.delete(key);
     };
 
     document.addEventListener('keydown', handleKeyDown);
