@@ -45,7 +45,7 @@ export function mapKeyToIndex(key: number) {
     return key - 20;
   } else if (key >= 52 && key <= 54) {  // idx 27-29
     return key - 25;
-  } else if (key <= 56 && key <= 57) { // idx 30-31
+  } else if (key >= 56 && key <= 57) { // idx 30-31
     return key - 26;
   } else {
     return null;
