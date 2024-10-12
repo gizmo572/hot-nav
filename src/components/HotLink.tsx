@@ -37,7 +37,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
   const [textColorRegistered, setTextColorRegistered] = useState<boolean>(false);
   const [clonedChildren, setClonedChildren] = useState<React.ReactNode | null>(null);
   const [containsImage, setContainsImage] = useState(false);
-  const [containsButton, setContainsButton] = useState(false);
+  const [containsButton, setContainsButton] = useState(true);
 
   const { className, href, style, onClick, customHotKeyPlacement=false, ...otherProps } = rest;
 
@@ -57,6 +57,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     if (!highlightNumber) return;
     let hrefFound = false;
     let onClickFound = false;
+    let btnFound = false;
     let highlightNumberAdded = false;
     const seen: any[] = []
     
@@ -116,17 +117,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
           }
 
           if (child.type === 'button' || (typeof child.type === 'object' && 'displayName' in child.type && (child.type as any).displayName === 'Button')) {
-            setContainsButton(true)
+            btnFound = true;
           }
-
-          if (typeof child.type === 'function') {
-            const x = React.createElement(child.type, {children});
-            if (!seen.includes(child.type.name)) {
-              seen.push(child.type.name);
-              cloneChildren(x);
-            }
-          }
-
 
           if (!highlightNumberAdded) {
             if (!customHotKeyPlacement) {
@@ -156,6 +148,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
         return child;
       });
     };
+
+    if (!btnFound) setContainsButton(false);
     const newClonedChildren = cloneChildren(children);
     setClonedChildren(newClonedChildren);
 
