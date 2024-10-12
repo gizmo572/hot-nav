@@ -99,7 +99,6 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
       // recursively clones the children of a HotLink component that is wrapping a button element and prepends the hotkey number to the children of the button
       return React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          console.log('child', child)
           const childProps = child.props;
 
           if (typeof childProps != 'object') return;
@@ -121,7 +120,6 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
           }
 
           if (typeof child.type === 'function') {
-            console.log('function type')
             const x = React.createElement(child.type, {children});
             if (!seen.includes(child.type.name)) {
               seen.push(child.type.name);
