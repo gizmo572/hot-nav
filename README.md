@@ -17,7 +17,7 @@ import { HotNavigationProvider } from 'hot-nav';
 
 export const metadata = {
   title: 'My NextJS App',
-  description: 'This app is uber accessible and amazing thanks to HotNav!',
+  description: 'This app is accessible and amazing thanks to HotNav!',
 };
 
 export default function RootLayout({ children }) {

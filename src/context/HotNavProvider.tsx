@@ -72,6 +72,7 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.key) return;
       const key = e.key.toLowerCase();
       if (key == 'control') {
         setHotKeysActivated((prev) => !prev);
@@ -96,6 +97,7 @@ export const HotNavigationProvider: React.FC<HotNavProviderProps> = ({ children,
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.key) return;
       if (routerDebounce && currentlyPressedKeysRef.current.size == 1) setRouterDebounce(false);
       const key = e.key.toLowerCase();
       if (hotkeysActivated && !routerDebounce && /^[1-9]$/i.test(key) && parseInt(key) <= links.length) {

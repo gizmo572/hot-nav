@@ -75,7 +75,7 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
     const addHighlightNumber = (element: React.ReactElement) => {
       const { href, onClick, ...otherProps } = element.props;
       if (!Object.hasOwn(otherProps, 'children')) {
-        return React.createElement('span', {className, style},
+        return (
           <>
             {highlightNumber}&nbsp;
             {React.cloneElement(
@@ -149,8 +149,8 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
       });
     };
 
-    if (!btnFound) setContainsButton(false);
     const newClonedChildren = cloneChildren(children);
+    if (!btnFound) setContainsButton(false);
     setClonedChildren(newClonedChildren);
 
     if (linkRef.current) {
@@ -206,7 +206,13 @@ const HotLink: React.FC<HotLinkProps> = ({ children, ...rest }): ReactElement =>
       </Link> : containsButton ?
       <div
         ref={linkRef as React.Ref<HTMLDivElement>}
-        onClick={highlightNumber || onClick ? (e: React.MouseEvent<HTMLDivElement>) => { onClickRef.current ? onClickRef.current(e) : (() => {}) } : undefined}
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+          if (highlightNumber) {
+            onClickRef.current && onClickRef.current(e);
+          } else if (onClick) {
+            onClick(e);
+          }
+        }}
         style={style}
         className={className || ''}
         {...otherProps}
